@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CleanConnect</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <svg class="icon-defs" aria-hidden="true">
+      <symbol id="icon-room" viewBox="0 0 24 24">
+        <path d="M5 21V5.8L12 3l7 2.8V21" />
+        <path d="M9 21v-8h6v8" />
+        <path d="M9 8h.01M15 8h.01" />
+      </symbol>
+      <symbol id="icon-location" viewBox="0 0 24 24">
+        <path d="M12 21s7-5.3 7-11a7 7 0 1 0-14 0c0 5.7 7 11 7 11z" />
+        <path d="M9.8 10a2.2 2.2 0 1 0 4.4 0 2.2 2.2 0 0 0-4.4 0" />
+      </symbol>
+      <symbol id="icon-time" viewBox="0 0 24 24">
+        <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z" />
+        <path d="M12 7v5l3 2" />
+      </symbol>
+      <symbol id="icon-spark" viewBox="0 0 24 24">
+        <path d="M12 3l1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7L12 3z" />
+        <path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15z" />
+      </symbol>
+      <symbol id="icon-users" viewBox="0 0 24 24">
+        <path d="M8 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
+        <path d="M2.5 21a5.5 5.5 0 0 1 11 0" />
+        <path d="M16 11.5a3 3 0 1 0 0-6" />
+        <path d="M17.5 15.5A4.8 4.8 0 0 1 21.5 21" />
+      </symbol>
+      <symbol id="icon-arrow" viewBox="0 0 24 24">
+        <path d="M5 12h14" />
+        <path d="M13 6l6 6-6 6" />
+      </symbol>
+      <symbol id="icon-back" viewBox="0 0 24 24">
+        <path d="M19 12H5" />
+        <path d="M11 6l-6 6 6 6" />
+      </symbol>
+      <symbol id="icon-card" viewBox="0 0 24 24">
+        <path d="M4 7h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z" />
+        <path d="M2 11h20" />
+        <path d="M6 16h3" />
+      </symbol>
+    </svg>
+    <main class="app-shell">
+      <section class="phone-frame" aria-label="CleanConnect mobile order interface">
+        <header class="app-header">
+          <div>
+            <h1 class="brand-wordmark" aria-label="CleanConnect">
+              <span>Clean</span><strong>Connect</strong>
+            </h1>
+          </div>
+          <div class="header-buttons">
+            <button class="profile-button" type="button" id="profile-button" aria-label="Open profile">
+              <svg class="icon" aria-hidden="true"><use href="#icon-users"></use></svg>
+            </button>
+            <button class="providers-button" type="button" id="providers-button">
+              <svg class="icon" aria-hidden="true"><use href="#icon-users"></use></svg>
+              Cleaners
+            </button>
+          </div>
+        </header>
+
+        <section class="screen active" data-screen="order">
+          <section class="card service-card active" id="cleaning-panel" data-panel="cleaning">
+            <form class="order-form">
+              <div class="order-slide active" data-order-slide="details">
+                <div class="field address-search" data-address-search>
+                  <label class="field-label" for="cleaning-location">
+                    <svg class="icon" aria-hidden="true"><use href="#icon-location"></use></svg>
+                    Cleaning address
+                  </label>
+                  <input
+                    class="field-control"
+                    id="cleaning-location"
+                    type="search"
+                    placeholder="Type in a location"
+                    autocomplete="street-address"
+                    required
+                    aria-autocomplete="list"
+                    aria-controls="cleaning-address-results"
+                  />
+                  <div class="address-results" id="cleaning-address-results" role="listbox"></div>
+                  <p class="field-hint">Serving West Philly area.</p>
+                </div>
+
+                <div class="field">
+                  <span class="field-label">
+                    <svg class="icon" aria-hidden="true"><use href="#icon-time"></use></svg>
+                    Time options
+                  </span>
+                  <div class="time-list" id="time-list">
+                    <div class="time-row">
+                      <div class="date-time-fields">
+                        <div class="date-picker">
+                          <input class="cleaning-date native-date-input" id="cleaning-date" type="text" required />
+                          <button class="field-control date-trigger" type="button" aria-haspopup="dialog" aria-expanded="false">Select date</button>
+                          <div class="date-menu hidden"></div>
+                        </div>
+                        <div class="time-picker">
+                          <select class="cleaning-time native-time-select" id="cleaning-time" required aria-label="Cleaning time"></select>
+                          <input class="field-control time-trigger" type="text" placeholder="Select time" autocomplete="off" inputmode="numeric" required aria-haspopup="listbox" aria-expanded="false" />
+                          <div class="time-menu hidden" role="listbox"></div>
+                        </div>
+                      </div>
+                      <button class="remove-time hidden" type="button" aria-label="Remove time">×</button>
+                    </div>
+                  </div>
+                  <button class="add-time-button" type="button" id="add-time-button">Add backup time</button>
+                </div>
+
+                <div class="selected-cleaner hidden" id="selected-cleaner">
+                  <div>
+                    <span>Selected cleaner</span>
+                    <strong id="selected-cleaner-name">Cleaner</strong>
+                  </div>
+                  <button class="clear-cleaner-button" type="button" id="clear-cleaner-button" aria-label="Clear selected cleaner">×</button>
+                </div>
+              </div>
+
+              <div class="order-slide" data-order-slide="scope">
+                <button class="back-button order-slide-back" type="button" id="order-top-back-button">
+                  <svg class="icon" aria-hidden="true"><use href="#icon-back"></use></svg>
+                  Back
+                </button>
+
+                <fieldset class="scope-group">
+                  <legend>
+                    <svg class="icon" aria-hidden="true"><use href="#icon-room"></use></svg>
+                    Cleaning scope
+                  </legend>
+
+                  <div class="scope-list">
+                    <div class="scope-row" data-scope="bedrooms">
+                      <span>Bedrooms</span>
+                      <div class="stepper">
+                        <button type="button" data-step="-1" aria-label="Decrease bedrooms">-</button>
+                        <strong data-count>1</strong>
+                        <button type="button" data-step="1" aria-label="Increase bedrooms">+</button>
+                      </div>
+                    </div>
+                    <div class="scope-row" data-scope="bathrooms">
+                      <span>Bathrooms</span>
+                      <div class="stepper">
+                        <button type="button" data-step="-1" aria-label="Decrease bathrooms">-</button>
+                        <strong data-count>1</strong>
+                        <button type="button" data-step="1" aria-label="Increase bathrooms">+</button>
+                      </div>
+                    </div>
+                    <div class="scope-row" data-scope="kitchen">
+                      <span>Kitchen</span>
+                      <div class="stepper">
+                        <button type="button" data-step="-1" aria-label="Decrease kitchen">-</button>
+                        <strong data-count>1</strong>
+                        <button type="button" data-step="1" aria-label="Increase kitchen">+</button>
+                      </div>
+                    </div>
+                    <div class="scope-row" data-scope="dining">
+                      <span>Dining</span>
+                      <div class="stepper">
+                        <button type="button" data-step="-1" aria-label="Decrease dining">-</button>
+                        <strong data-count>0</strong>
+                        <button type="button" data-step="1" aria-label="Increase dining">+</button>
+                      </div>
+                    </div>
+                    <div class="scope-row" data-scope="livingRoom">
+                      <span>Living room</span>
+                      <div class="stepper">
+                        <button type="button" data-step="-1" aria-label="Decrease living room">-</button>
+                        <strong data-count>1</strong>
+                        <button type="button" data-step="1" aria-label="Increase living room">+</button>
+                      </div>
+                    </div>
+                  </div>
+                </fieldset>
+
+                <fieldset class="intensity-group">
+                  <legend>
+                    <svg class="icon" aria-hidden="true"><use href="#icon-spark"></use></svg>
+                    Cleaning intensity
+                  </legend>
+                  <div class="intensity-grid" role="radiogroup" aria-label="Cleaning intensity">
+                    <label>
+                      <input type="radio" name="intensity" value="Light" />
+                      <span>Light</span>
+                    </label>
+                    <label>
+                      <input type="radio" name="intensity" value="Standard" checked />
+                      <span>Standard</span>
+                    </label>
+                    <label>
+                      <input type="radio" name="intensity" value="Deep" />
+                      <span>Deep</span>
+                    </label>
+                  </div>
+                </fieldset>
+
+                <label class="field">
+                  <span class="field-label">
+                    <svg class="icon" aria-hidden="true"><use href="#icon-spark"></use></svg>
+                    Extra instructions optional
+                  </span>
+                  <textarea
+                    class="field-control field-textarea"
+                    name="cleaning-notes"
+                    placeholder="Optional: access notes, no-touch items, or timing details."
+                  ></textarea>
+                </label>
+              </div>
+            </form>
+          </section>
+
+          <div class="order-actions">
+            <button class="secondary-cta" type="button" id="order-back-button">Back</button>
+            <button class="primary-cta" type="button" id="order-next-button">
+              <span>Continue</span>
+              <svg class="icon cta-arrow" aria-hidden="true"><use href="#icon-arrow"></use></svg>
+            </button>
+            <button class="primary-cta hidden" type="button" id="confirm-button">
+              <span id="submit-label">Book cleaning</span>
+              <svg class="icon cta-arrow" aria-hidden="true"><use href="#icon-arrow"></use></svg>
+            </button>
+          </div>
+        </section>
+
+        <section class="screen instructions-screen" data-screen="instructions" aria-live="polite">
+          <button class="back-button" type="button" id="back-button">
+            <svg class="icon" aria-hidden="true"><use href="#icon-back"></use></svg>
+            Back
+          </button>
+
+          <div class="card instructions-heading">
+            <p id="instructions-kicker">Room clean confirmed</p>
+            <h2 id="instructions-title">You are booked</h2>
+            <p id="instructions-copy">Your cleaner will arrive at your selected time.</p>
+          </div>
+
+          <ul class="instruction-list" id="instruction-list">
+            <li>Be present or leave clear access instructions.</li>
+            <li>Put away valuables and private items.</li>
+            <li>Clear surfaces you want cleaned.</li>
+            <li>Mark or mention any no-touch areas.</li>
+          </ul>
+
+          <button class="primary-cta" type="button" id="done-button">
+            <span>Move to payment</span>
+            <svg class="icon cta-arrow" aria-hidden="true"><use href="#icon-arrow"></use></svg>
+          </button>
+        </section>
+
+        <section class="screen payment-screen" data-screen="payment" aria-live="polite">
+          <button class="back-button" type="button" id="payment-back-button">
+            <svg class="icon" aria-hidden="true"><use href="#icon-back"></use></svg>
+            Back
+          </button>
+
+          <div class="card payment-heading">
+            <p id="payment-kicker">Payment</p>
+            <h2 id="payment-title">Finish booking</h2>
+            <p id="payment-copy">Review your service and confirm payment.</p>
+          </div>
+
+          <div class="card payment-summary" id="payment-summary" role="button" tabindex="0" aria-expanded="false">
+            <div class="payment-summary-top">
+              <div>
+                <p class="summary-label">Service</p>
+                <h3 id="payment-service">Room cleaning</h3>
+              </div>
+              <span id="payment-price">$32</span>
+            </div>
+            <div class="payment-order-details hidden" id="payment-order-details"></div>
+          </div>
+
+          <div class="card payment-method">
+            <div class="payment-method-icon">
+              <svg class="icon" aria-hidden="true"><use href="#icon-card"></use></svg>
+            </div>
+            <div>
+              <p class="summary-label">Payment method</p>
+              <h3>Campus card ending 1842</h3>
+            </div>
+          </div>
+
+          <button class="primary-cta" type="button" id="pay-button">
+            <span id="pay-label">Pay and book</span>
+            <svg class="icon cta-arrow" aria-hidden="true"><use href="#icon-arrow"></use></svg>
+          </button>
+        </section>
+
+        <section class="screen confirmation-screen" data-screen="confirmation" aria-live="polite">
+          <div class="confirmation-mark" aria-hidden="true">
+            <svg class="icon" aria-hidden="true"><use href="#icon-spark"></use></svg>
+          </div>
+
+          <div class="card confirmation-heading">
+            <p>Booking confirmed</p>
+            <h2>Thank you</h2>
+            <p>Your cleaning request has been sent. You can relax now.</p>
+          </div>
+
+          <div class="card confirmation-summary">
+            <div>
+              <p class="summary-label">Service</p>
+              <h3>Room cleaning</h3>
+            </div>
+            <span id="confirmation-price">$32</span>
+          </div>
+
+          <button class="primary-cta" type="button" id="new-booking-button">
+            <span>Book another cleaning</span>
+            <svg class="icon cta-arrow" aria-hidden="true"><use href="#icon-arrow"></use></svg>
+          </button>
+        </section>
+
+        <section class="screen providers-screen" data-screen="providers" aria-live="polite">
+          <button class="back-button" type="button" id="providers-back-button">
+            <svg class="icon" aria-hidden="true"><use href="#icon-back"></use></svg>
+            Back
+          </button>
+
+          <div class="card providers-heading">
+            <h2 id="providers-title">Connected cleaners</h2>
+          </div>
+
+          <label class="provider-search" id="provider-search-wrap">
+            <span>Find cleaner</span>
+            <input id="provider-search" type="search" placeholder="Search by name or title" autocomplete="off" />
+          </label>
+
+          <div class="provider-list" id="provider-list"></div>
+          <div class="slot-list hidden" id="slot-list"></div>
+        </section>
+
+        <section class="screen profile-screen" data-screen="profile" aria-live="polite">
+          <button class="back-button" type="button" id="profile-back-button">
+            <svg class="icon" aria-hidden="true"><use href="#icon-back"></use></svg>
+            Back
+          </button>
+
+          <div class="card profile-heading">
+            <p>Emmett</p>
+            <h2>Your cleanings</h2>
+          </div>
+
+          <section class="profile-section auth-section" id="student-auth-section">
+            <div class="profile-section-heading">
+              <p>Account</p>
+              <span id="student-auth-status">Local</span>
+            </div>
+            <form class="auth-form" id="student-auth-form">
+              <input id="student-auth-email" type="email" placeholder="Email" autocomplete="email" />
+              <input id="student-auth-password" type="password" placeholder="Password" autocomplete="current-password" />
+              <div class="auth-actions">
+                <button class="save-request-button" type="submit">Sign in / create</button>
+                <button type="button" id="student-sign-out">Sign out</button>
+              </div>
+              <p class="auth-message" id="student-auth-message"></p>
+            </form>
+          </section>
+
+          <section class="profile-section">
+            <div class="profile-section-heading">
+              <p>Upcoming requests</p>
+              <span id="upcoming-count">0</span>
+            </div>
+            <div class="profile-list" id="upcoming-list"></div>
+          </section>
+
+          <section class="profile-section">
+            <div class="profile-section-heading">
+              <p>Previous cleaners</p>
+              <span id="previous-cleaner-count">0</span>
+            </div>
+            <div class="profile-list" id="previous-cleaners-list"></div>
+          </section>
+        </section>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="supabase-sync.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

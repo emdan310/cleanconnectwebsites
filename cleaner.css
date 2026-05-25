@@ -1,0 +1,1253 @@
+:root {
+  color-scheme: light;
+  --ink: #132622;
+  --muted: #72827d;
+  --surface: #fffaf1;
+  --surface-soft: #f6efe4;
+  --card: rgba(255, 253, 247, 0.84);
+  --line: rgba(31, 69, 61, 0.12);
+  --teal: #0f7d68;
+  --teal-deep: #0b3d35;
+  --mint: rgba(159, 240, 215, 0.34);
+  --aqua: rgba(119, 216, 232, 0.18);
+  --shadow: 0 18px 46px rgba(29, 58, 50, 0.1);
+  --radius-lg: 24px;
+  --radius-md: 18px;
+  --radius-sm: 14px;
+  --calendar-slot-height: 24px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 18% 12%, var(--mint), transparent 28%),
+    radial-gradient(circle at 86% 18%, var(--aqua), transparent 30%),
+    linear-gradient(180deg, var(--surface) 0%, var(--surface-soft) 100%);
+}
+
+button,
+a {
+  font: inherit;
+}
+
+.cleaner-shell {
+  width: min(430px, calc(100% - 28px));
+  min-height: min(880px, calc(100vh - 32px));
+  margin: 0 auto;
+  overflow-x: hidden;
+  padding: 22px 0;
+}
+
+.cleaner-header,
+.profile-card,
+.section-heading,
+.job-actions {
+  display: flex;
+  align-items: center;
+}
+
+.cleaner-header {
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.login-screen,
+.work-screen {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+.cleaner-view {
+  display: none;
+  min-width: 0;
+}
+
+.cleaner-view.active {
+  display: block;
+}
+
+.cleaner-header p,
+.kicker,
+.section-heading p {
+  margin: 0 0 6px;
+  color: var(--teal);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 0;
+  color: var(--teal-deep);
+  font-size: 2.35rem;
+  line-height: 1;
+}
+
+.brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.brand-mark {
+  position: relative;
+  width: 44px;
+  height: 34px;
+  flex: 0 0 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand-mark span {
+  width: 15px;
+  height: 27px;
+  border: 7px solid #78a9a7;
+  border-right: 0;
+  border-radius: 16px 0 0 16px;
+}
+
+.brand-mark span:last-child {
+  border: 7px solid var(--teal-deep);
+  border-left: 0;
+  border-radius: 0 16px 16px 0;
+}
+
+.brand-mark i {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #78a9a7;
+  transform: translateX(-50%);
+}
+
+.brand-wordmark {
+  display: inline-flex;
+  align-items: baseline;
+  margin-bottom: 0;
+  color: var(--teal-deep);
+  font-size: clamp(1.7rem, 8vw, 2.25rem);
+  font-weight: 860;
+  line-height: 0.95;
+  white-space: nowrap;
+}
+
+.brand-wordmark span {
+  color: #78a9a7;
+  font-weight: 760;
+}
+
+.brand-wordmark strong {
+  color: var(--teal-deep);
+  font-weight: 900;
+}
+
+h2,
+h3 {
+  margin-bottom: 0;
+}
+
+.sign-out-button,
+.login-card button,
+.job-actions button {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  color: var(--ink);
+  background: rgba(255, 253, 247, 0.78);
+  font-weight: 850;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.sign-out-button {
+  min-height: 42px;
+  padding: 0 13px;
+}
+
+.profile-card,
+.login-card,
+.metric-card,
+.job-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.profile-card {
+  gap: 12px;
+  margin-bottom: 14px;
+  padding: 16px;
+}
+
+.profile-card h2 {
+  color: var(--teal-deep);
+  font-size: 1.55rem;
+}
+
+.login-card {
+  display: grid;
+  gap: 13px;
+  padding: 16px;
+}
+
+.login-card label {
+  display: grid;
+  gap: 7px;
+}
+
+.login-card label span {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 850;
+}
+
+.login-card input {
+  min-height: 48px;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 0 13px;
+  color: var(--ink);
+  background: rgba(255, 253, 247, 0.86);
+  font: inherit;
+  font-weight: 780;
+  outline: none;
+}
+
+.login-card input:focus {
+  border-color: rgba(15, 125, 104, 0.35);
+  box-shadow: 0 0 0 4px rgba(159, 240, 215, 0.18);
+}
+
+.login-error {
+  min-height: 18px;
+  margin-bottom: 0;
+  color: #9c3f2d;
+  font-size: 0.84rem;
+  font-weight: 820;
+}
+
+.login-card button {
+  min-height: 50px;
+  color: #fffdf7;
+  background: linear-gradient(135deg, #0b3d35, #138f76);
+  box-shadow: 0 14px 28px rgba(11, 61, 53, 0.18);
+}
+
+.cleaner-tabs {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(255, 253, 247, 0.54);
+}
+
+.cleaner-tab {
+  min-width: 0;
+  min-height: 42px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  color: var(--ink);
+  background: transparent;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 850;
+  overflow: hidden;
+  padding: 0 4px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.cleaner-tab.active {
+  border-color: rgba(31, 69, 61, 0.14);
+  color: var(--teal-deep);
+  background: rgba(255, 253, 247, 0.92);
+  box-shadow: 0 8px 18px rgba(29, 58, 50, 0.08);
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.metric-card.primary {
+  grid-column: 1 / -1;
+}
+
+.metric-card {
+  min-height: 82px;
+  padding: 14px;
+}
+
+.metric-card span,
+.section-heading > span,
+.job-time,
+.job-detail,
+.job-notes,
+.empty-state,
+.slot-chip span,
+.slot-chip em {
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-weight: 780;
+}
+
+.slot-chip a,
+.map-link {
+  color: var(--teal-deep);
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.slot-chip a:hover,
+.map-link:hover {
+  text-decoration: underline;
+}
+
+.metric-card strong {
+  display: block;
+  margin-top: 8px;
+  color: var(--teal-deep);
+  font-size: 1.45rem;
+}
+
+.metric-card.primary {
+  color: #fffdf7;
+  background: linear-gradient(135deg, #0b3d35, #138f76);
+}
+
+.metric-card.primary span,
+.metric-card.primary strong {
+  color: #fffdf7;
+}
+
+.availability-card,
+.jobs-section {
+  margin-top: 16px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.section-heading {
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.calendar-controls {
+  display: flex;
+  gap: 6px;
+}
+
+.calendar-controls button {
+  min-height: 34px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 0 10px;
+  color: var(--ink);
+  background: rgba(255, 253, 247, 0.78);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.calendar-zoom {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-bottom: 10px;
+  padding: 5px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 253, 247, 0.54);
+}
+
+.calendar-zoom button {
+  min-width: 0;
+  min-height: 34px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: var(--ink);
+  background: transparent;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 850;
+  overflow: hidden;
+  padding: 0 4px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.calendar-zoom button.active {
+  border-color: rgba(31, 69, 61, 0.14);
+  color: var(--teal-deep);
+  background: rgba(255, 253, 247, 0.92);
+}
+
+.slot-strip {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.slot-chip {
+  display: grid;
+  gap: 12px;
+  min-height: 0;
+  width: 100%;
+  padding: 15px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  color: var(--ink);
+  background: rgba(255, 253, 247, 0.7);
+  text-align: left;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease;
+}
+
+.slot-chip:hover {
+  border-color: rgba(15, 125, 104, 0.26);
+  background: rgba(255, 253, 247, 0.9);
+  transform: translateY(-1px);
+}
+
+.slot-chip.selected {
+  border-color: rgba(31, 69, 61, 0.28);
+  background: rgba(255, 253, 247, 0.92);
+}
+
+.slot-chip:active {
+  transform: scale(0.99);
+}
+
+.slot-main {
+  display: grid;
+  gap: 3px;
+}
+
+.slot-chip strong,
+.slot-chip span,
+.slot-chip em,
+.slot-chip small {
+  overflow-wrap: anywhere;
+}
+
+.slot-chip strong {
+  color: var(--teal-deep);
+  font-size: 1rem;
+  line-height: 1.32;
+}
+
+.slot-chip span {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.slot-chip em {
+  width: fit-content;
+  border-radius: 999px;
+  padding: 7px 10px;
+  color: var(--teal-deep);
+  background: var(--mint);
+  font-size: 0.78rem;
+  font-weight: 900;
+  font-style: normal;
+}
+
+.slot-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.slot-chip button {
+  width: fit-content;
+  min-height: 34px;
+  margin-top: 0;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 7px 11px;
+  color: var(--ink);
+  background: rgba(255, 253, 247, 0.78);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.slot-chip button.selected {
+  border-color: rgba(31, 69, 61, 0.24);
+  background: rgba(255, 253, 247, 0.96);
+}
+
+.slot-chip .slot-confirm {
+  color: #fffdf7;
+  background: var(--teal-deep);
+}
+
+.job-list {
+  display: grid;
+  gap: 12px;
+}
+
+.job-card {
+  display: grid;
+  gap: 10px;
+  border-radius: 18px;
+  padding: 16px;
+}
+
+.job-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.job-main {
+  display: grid;
+  gap: 4px;
+}
+
+.job-card h3 {
+  max-width: 100%;
+  color: var(--ink);
+  font-size: 0.92rem;
+  font-weight: 760;
+  line-height: 1.32;
+  overflow-wrap: anywhere;
+}
+
+.job-card .map-link {
+  width: fit-content;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 780;
+}
+
+.job-time {
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  color: var(--ink);
+  background: transparent;
+  font-size: 1.08rem;
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+
+.job-meta {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 720;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.job-pay {
+  flex: 0 0 auto;
+  color: var(--ink);
+  font-size: 0.95rem;
+  font-weight: 900;
+}
+
+.job-notes {
+  margin: 0;
+  line-height: 1.42;
+}
+
+.job-actions {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.job-actions button {
+  min-height: 0;
+  border-radius: 0;
+  padding: 0;
+  font-size: 0.72rem;
+}
+
+.job-actions .cancel-job {
+  border: 0;
+  color: var(--muted);
+  background: transparent;
+  box-shadow: none;
+  font-weight: 820;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.empty-state {
+  padding: 18px;
+  border: 1px dashed rgba(31, 69, 61, 0.2);
+  border-radius: 18px;
+  background: rgba(255, 253, 247, 0.46);
+}
+
+.availability-editor {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.availability-grid {
+  display: grid;
+  grid-template-columns: 44px repeat(7, minmax(74px, 1fr));
+  min-width: 620px;
+}
+
+.availability-corner,
+.availability-day-head {
+  min-height: 42px;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 2px;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.66rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.availability-corner,
+.availability-time-rail {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  background: rgba(255, 253, 247, 0.94);
+}
+
+.availability-day-head,
+.availability-day-column {
+  scroll-snap-align: start;
+}
+
+.availability-day-head strong,
+.availability-day-head span {
+  display: block;
+  line-height: 1.15;
+  text-align: center;
+}
+
+.availability-day-head span {
+  color: var(--ink);
+  font-size: 0.82rem;
+}
+
+.availability-time-rail {
+  display: grid;
+  border-right: 1px solid var(--line);
+}
+
+.availability-time-label {
+  min-height: var(--calendar-slot-height);
+  padding: 2px 5px 0 0;
+  color: var(--muted);
+  font-size: 0.58rem;
+  font-weight: 780;
+  text-align: right;
+}
+
+.availability-day-column {
+  position: relative;
+  display: grid;
+  border-right: 1px solid var(--line);
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(31, 69, 61, 0.08) 0,
+      rgba(31, 69, 61, 0.08) 1px,
+      transparent 1px,
+      transparent 24px
+    ),
+    rgba(255, 253, 247, 0.56);
+}
+
+.availability-day-column:last-child {
+  border-right: 0;
+}
+
+.availability-cell {
+  min-height: var(--calendar-slot-height);
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  touch-action: pan-x;
+}
+
+.availability-cell:hover {
+  background: rgba(159, 240, 215, 0.12);
+}
+
+.availability-block {
+  position: absolute;
+  left: 5px;
+  right: 5px;
+  z-index: 2;
+  display: grid;
+  align-content: start;
+  gap: 2px;
+  min-height: 34px;
+  border: 1px solid rgba(31, 69, 61, 0.2);
+  border-radius: 16px;
+  padding: 7px 24px 7px 8px;
+  color: #fffdf7;
+  background: linear-gradient(135deg, #0b3d35, #138f76);
+  box-shadow: 0 10px 22px rgba(11, 61, 53, 0.16);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.availability-block.dragging {
+  cursor: grabbing;
+  opacity: 0.86;
+}
+
+.availability-draft {
+  pointer-events: none;
+}
+
+.availability-block strong,
+.availability-block span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.availability-block strong {
+  font-size: 0.72rem;
+  line-height: 1.1;
+}
+
+.availability-block span {
+  opacity: 0.82;
+  font-size: 0.62rem;
+  font-weight: 780;
+}
+
+.availability-remove {
+  position: absolute;
+  top: 5px;
+  right: 6px;
+  width: 16px;
+  height: 16px;
+  border: 0;
+  border-radius: 50%;
+  padding: 0;
+  color: #fffdf7;
+  background: rgba(255, 253, 247, 0.18);
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 900;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.cleaner-calendar-card {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.work-calendar-grid {
+  display: grid;
+  grid-template-columns: 44px repeat(7, minmax(74px, 1fr));
+  min-width: 620px;
+}
+
+.work-calendar-grid.day-mode {
+  grid-template-columns: 44px minmax(280px, 1fr);
+  min-width: 0;
+}
+
+.work-calendar-corner,
+.work-calendar-day-head {
+  min-height: 42px;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 2px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  background: transparent;
+  font: inherit;
+  font-size: 0.66rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.work-calendar-day-head strong,
+.work-calendar-day-head span {
+  display: block;
+  line-height: 1.15;
+  text-align: center;
+}
+
+.work-calendar-day-head span {
+  color: var(--ink);
+  font-size: 0.82rem;
+}
+
+.work-calendar-time-rail {
+  display: grid;
+  border-right: 1px solid var(--line);
+}
+
+.work-calendar-time-label {
+  min-height: var(--calendar-slot-height);
+  padding: 2px 5px 0 0;
+  color: var(--muted);
+  font-size: 0.58rem;
+  font-weight: 780;
+  text-align: right;
+}
+
+.work-calendar-day-column {
+  position: relative;
+  display: grid;
+  border-right: 1px solid var(--line);
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(31, 69, 61, 0.08) 0,
+      rgba(31, 69, 61, 0.08) 1px,
+      transparent 1px,
+      transparent 24px
+    ),
+    rgba(255, 253, 247, 0.56);
+}
+
+.work-calendar-day-column:last-child {
+  border-right: 0;
+}
+
+.work-calendar-cell {
+  min-height: var(--calendar-slot-height);
+}
+
+.work-calendar-block {
+  position: absolute;
+  left: 5px;
+  right: 5px;
+  z-index: 2;
+  display: grid;
+  align-content: start;
+  gap: 2px;
+  min-height: 34px;
+  border: 1px solid rgba(31, 69, 61, 0.22);
+  border-radius: 16px;
+  padding: 7px 8px;
+  color: var(--ink);
+  background: rgba(255, 253, 247, 0.96);
+  box-shadow: 0 10px 22px rgba(29, 58, 50, 0.12);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.work-calendar-block:hover,
+.work-calendar-block.selected {
+  border-color: rgba(31, 69, 61, 0.42);
+  background: #fffdf7;
+}
+
+.work-calendar-block strong,
+.work-calendar-block span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.work-calendar-block strong {
+  font-size: 0.72rem;
+  line-height: 1.1;
+}
+
+.work-calendar-block span {
+  color: var(--muted);
+  font-size: 0.62rem;
+  font-weight: 780;
+}
+
+.cleaner-calendar-weekdays,
+.cleaner-calendar-month-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  min-width: 560px;
+}
+
+.cleaner-calendar-weekdays {
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.cleaner-calendar-weekdays span {
+  color: var(--muted);
+  font-size: 0.58rem;
+  font-weight: 900;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.cleaner-calendar-month-grid {
+  gap: 4px;
+}
+
+.cleaner-calendar-cell {
+  aspect-ratio: 1;
+  min-height: 0;
+  min-width: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  align-content: start;
+  gap: 3px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(255, 253, 247, 0.7);
+  overflow: hidden;
+}
+
+.cleaner-calendar-cell.muted {
+  background: rgba(255, 253, 247, 0.32);
+}
+
+.cleaner-calendar-number {
+  width: auto;
+  height: auto;
+  border: 0;
+  padding: 0;
+  display: grid;
+  justify-self: start;
+  color: var(--ink);
+  background: transparent;
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.cleaner-calendar-jobs {
+  display: grid;
+  align-content: start;
+  gap: 3px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.cleaner-calendar-job {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 30px;
+  padding: 4px 5px;
+  border: 1px solid rgba(31, 69, 61, 0.22);
+  border-radius: 12px;
+  color: var(--ink);
+  background: rgba(255, 253, 247, 0.86);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.cleaner-calendar-job:hover,
+.cleaner-calendar-job.selected {
+  border-color: rgba(31, 69, 61, 0.42);
+  background: rgba(255, 253, 247, 1);
+}
+
+.cleaner-calendar-job strong,
+.cleaner-calendar-job span {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 0.66rem;
+  line-height: 1.16;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cleaner-calendar-job strong {
+  font-weight: 900;
+}
+
+.cleaner-calendar-job span {
+  color: var(--muted);
+  font-weight: 780;
+}
+
+.cleaner-calendar-detail {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.cleaner-calendar-detail > div > p {
+  margin-bottom: 6px;
+  color: var(--teal);
+  font-size: 0.76rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.cleaner-calendar-detail h3 {
+  margin-bottom: 5px;
+}
+
+.cleaner-calendar-detail span {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-weight: 780;
+}
+
+.cleaner-detail-summary {
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 820;
+  line-height: 1.4;
+}
+
+@media (max-width: 760px) {
+  .cleaner-header,
+  .profile-card,
+  .job-main {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .cleaner-header {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 520px) {
+  :root {
+    --calendar-slot-height: 30px;
+  }
+
+  .cleaner-shell {
+    width: min(100% - 18px, 430px);
+    padding: 14px 0;
+  }
+
+  .cleaner-header {
+    margin-bottom: 14px;
+  }
+
+  .brand-wordmark {
+    font-size: clamp(1.45rem, 7vw, 1.8rem);
+  }
+
+  .sign-out-button {
+    min-height: 38px;
+    padding: 0 10px;
+    font-size: 0.8rem;
+  }
+
+  .cleaner-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 5px;
+    padding: 4px;
+  }
+
+  .cleaner-tab {
+    min-height: 38px;
+    border-radius: 12px;
+    font-size: 0.68rem;
+  }
+
+  .section-heading {
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .section-heading h2 {
+    font-size: 1.35rem;
+    line-height: 1.1;
+  }
+
+  .calendar-controls button,
+  .calendar-zoom button {
+    min-height: 40px;
+  }
+
+  .calendar-zoom {
+    gap: 4px;
+    padding: 4px;
+  }
+
+  .job-card,
+  .slot-chip {
+    padding: 14px;
+  }
+
+  .slot-actions button {
+    min-height: 40px;
+  }
+
+  .availability-editor,
+  .cleaner-calendar-card {
+    margin-inline: -9px;
+    border-inline: 0;
+    border-radius: 20px;
+  }
+
+  .availability-grid {
+    grid-template-columns: 42px repeat(7, 142px);
+    min-width: 1036px;
+  }
+
+  .availability-corner,
+  .availability-day-head,
+  .work-calendar-corner,
+  .work-calendar-day-head {
+    min-height: 46px;
+  }
+
+  .availability-day-column,
+  .work-calendar-day-column {
+    background:
+      repeating-linear-gradient(
+        to bottom,
+        rgba(31, 69, 61, 0.08) 0,
+        rgba(31, 69, 61, 0.08) 1px,
+        transparent 1px,
+        transparent 30px
+      ),
+      rgba(255, 253, 247, 0.56);
+  }
+
+  .availability-block {
+    min-height: 44px;
+    padding: 9px 30px 9px 10px;
+  }
+
+  .availability-remove {
+    width: 22px;
+    height: 22px;
+  }
+
+  .work-calendar-grid {
+    grid-template-columns: 42px repeat(7, 142px);
+    min-width: 1036px;
+  }
+
+  .work-calendar-grid.day-mode {
+    grid-template-columns: 42px minmax(0, 1fr);
+    min-width: 0;
+  }
+
+  .work-calendar-block {
+    min-height: 42px;
+    padding: 9px 10px;
+  }
+
+  .work-calendar-block strong,
+  .availability-block strong {
+    font-size: 0.82rem;
+  }
+
+  .work-calendar-block span,
+  .availability-block span {
+    font-size: 0.72rem;
+  }
+
+  .cleaner-calendar-weekdays,
+  .cleaner-calendar-month-grid {
+    min-width: 520px;
+  }
+
+  .cleaner-calendar-job {
+    min-height: 36px;
+  }
+
+  .cleaner-calendar-detail {
+    margin-inline: -9px;
+    border-inline: 0;
+    border-radius: 20px;
+  }
+}
+
+@media (max-width: 380px) {
+  .metric-grid,
+  .slot-strip {
+    grid-template-columns: 1fr;
+  }
+}
