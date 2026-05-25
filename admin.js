@@ -2,6 +2,7 @@ const requestStorageKey = "cleanconnectRequests";
 const cleanersStorageKey = "cleanconnectCleaners";
 const cleanerSessionKey = "cleanconnectCleanerSession";
 const updatesStorageKey = "cleanconnectUpdates";
+const financeStorageKey = "cleanconnectFinanceEntries";
 const exampleResetStorageKey = "cleanconnectExamplesClearedV2";
 const defaultCleaners = [];
 const tabs = document.querySelectorAll(".ops-tab");
@@ -26,6 +27,19 @@ const cleanerList = document.querySelector("#cleaner-list");
 const cleanerCount = document.querySelector("#cleaner-count");
 const updatesList = document.querySelector("#updates-list");
 const updateCount = document.querySelector("#update-count");
+const financeForm = document.querySelector("#finance-form");
+const financeType = document.querySelector("#finance-type");
+const financeCategory = document.querySelector("#finance-category");
+const financeTitle = document.querySelector("#finance-title");
+const financeAmount = document.querySelector("#finance-amount");
+const financeDate = document.querySelector("#finance-date");
+const financeNotes = document.querySelector("#finance-notes");
+const financeNet = document.querySelector("#finance-net");
+const financeBookings = document.querySelector("#finance-bookings");
+const financeRevenue = document.querySelector("#finance-revenue");
+const financeExpenses = document.querySelector("#finance-expenses");
+const financeCount = document.querySelector("#finance-count");
+const financeLedger = document.querySelector("#finance-ledger");
 let calendarAnchor = null;
 
 const clearExampleDataOnce = () => {
@@ -35,6 +49,7 @@ const clearExampleDataOnce = () => {
   localStorage.setItem(requestStorageKey, "[]");
   localStorage.setItem(cleanersStorageKey, "[]");
   localStorage.setItem(updatesStorageKey, "[]");
+  localStorage.setItem(financeStorageKey, "[]");
   localStorage.removeItem(cleanerSessionKey);
   localStorage.setItem(exampleResetStorageKey, "true");
 };
@@ -46,6 +61,30 @@ const readRequests = () =>
 
 const readUpdates = () =>
   JSON.parse(localStorage.getItem(updatesStorageKey) || "[]");
+
+const readFinanceEntries = () =>
+  JSON.parse(localStorage.getItem(financeStorageKey) || "[]").map((entry) => ({
+    id: entry.id || `FIN-${Date.now()}`,
+    type: entry.type === "expense" ? "expense" : "revenue",
+    title: entry.title || "Untitled entry",
+    category: entry.category || "General",
+    amount: Math.max(0, Number(entry.amount) || 0),
+    date: entry.date || new Date().toISOString().slice(0, 10),
+    notes: entry.notes || "",
+    source: "manual",
+  }));
+
+const writeFinanceEntries = (entries) => {
+  localStorage.setItem(financeStorageKey, JSON.stringify(entries));
+};
+
+const escapeHtml = (value = "") =>
+  String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 
 const normalizeCleaner = (cleaner) => {
   if (typeof cleaner === "string") {
@@ -85,7 +124,7 @@ const money = (value) =>
   new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
-    maximumFractionDigits: 0,
+    maximumFractionDigits: 2,
   }).format(value);
 
 const formatDateTime = (value) => {
@@ -315,6 +354,92 @@ const renderUpdates = () => {
     .join("");
 };
 
+const formatFinanceDate = (value) => {
+  const date = new Date(`${value}T12:00:00`);
+  if (Number.isNaN(date.getTime())) return "Date not set";
+
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(date);
+};
+
+const bookingFinanceRows = (requests) =>
+  requests
+    .filter((request) => request.service === "cleaning")
+    .map((request) => ({
+      id: `booking-${request.id}`,
+      requestId: request.id,
+      type: "revenue",
+      title: request.serviceLabel || "Room cleaning",
+      category: "Booking",
+      amount: Number(request.charge) || 0,
+      date: (request.submittedAt || request.scheduledAt || new Date().toISOString()).slice(0, 10),
+      notes: `${request.location || "Address not set"} / ${requestTimeLabel(request)}`,
+      source: "booking",
+    }));
+
+const signedFinanceAmount = (entry) =>
+  entry.type === "expense" ? -Math.abs(entry.amount) : Math.abs(entry.amount);
+
+const renderFinances = () => {
+  if (!financeLedger) return;
+
+  const bookings = bookingFinanceRows(readRequests());
+  const manualEntries = readFinanceEntries();
+  const entries = [...bookings, ...manualEntries].sort(
+    (left, right) => new Date(right.date) - new Date(left.date),
+  );
+  const bookingRevenue = bookings.reduce((sum, entry) => sum + entry.amount, 0);
+  const manualRevenue = manualEntries
+    .filter((entry) => entry.type === "revenue")
+    .reduce((sum, entry) => sum + entry.amount, 0);
+  const expenses = manualEntries
+    .filter((entry) => entry.type === "expense")
+    .reduce((sum, entry) => sum + entry.amount, 0);
+  const net = bookingRevenue + manualRevenue - expenses;
+
+  financeNet.textContent = money(net);
+  financeBookings.textContent = money(bookingRevenue);
+  financeRevenue.textContent = money(manualRevenue);
+  financeExpenses.textContent = money(expenses);
+  financeCount.textContent = `${entries.length} ${entries.length === 1 ? "entry" : "entries"}`;
+
+  if (!entries.length) {
+    financeLedger.innerHTML = '<div class="empty-state">Paid bookings and manual finance entries will appear here.</div>';
+    return;
+  }
+
+  financeLedger.innerHTML = entries
+    .map((entry) => {
+      const signedAmount = signedFinanceAmount(entry);
+      const canDelete = entry.source === "manual";
+      return `
+        <article class="finance-row ${entry.type}">
+          <div>
+            <span>${escapeHtml(entry.category)} / ${entry.source === "booking" ? "Auto" : "Manual"}</span>
+            <h3>${escapeHtml(entry.title)}</h3>
+            <p>${escapeHtml(entry.notes || "No notes")}</p>
+            <time>${escapeHtml(formatFinanceDate(entry.date))}</time>
+          </div>
+          <div class="finance-row-actions">
+            <strong>${money(signedAmount)}</strong>
+            ${canDelete ? `<button type="button" data-remove-finance="${escapeHtml(entry.id)}">Remove</button>` : ""}
+          </div>
+        </article>
+      `;
+    })
+    .join("");
+
+  financeLedger.querySelectorAll("[data-remove-finance]").forEach((button) => {
+    button.addEventListener("click", () => {
+      writeFinanceEntries(readFinanceEntries().filter((entry) => entry.id !== button.dataset.removeFinance));
+      renderFinances();
+    });
+  });
+};
+
 const renderCleaners = () => {
   const cleaners = readCleaners();
   if (cleanerCount) cleanerCount.textContent = `${cleaners.length} active`;
@@ -430,8 +555,37 @@ cleanerForm.addEventListener("submit", async (event) => {
   renderCleaners();
 });
 
+financeForm?.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const amount = Number(financeAmount.value);
+  if (!amount || amount < 0) return;
+
+  writeFinanceEntries([
+    {
+      id: `FIN-${Date.now()}`,
+      type: financeType.value === "expense" ? "expense" : "revenue",
+      category: financeCategory.value.trim() || "General",
+      title: financeTitle.value.trim(),
+      amount,
+      date: financeDate.value || new Date().toISOString().slice(0, 10),
+      notes: financeNotes.value.trim(),
+      source: "manual",
+    },
+    ...readFinanceEntries(),
+  ]);
+
+  financeTitle.value = "";
+  financeAmount.value = "";
+  financeNotes.value = "";
+  renderFinances();
+});
+
 const initializeAdmin = () => {
+  if (financeDate && !financeDate.value) {
+    financeDate.value = new Date().toISOString().slice(0, 10);
+  }
   renderDashboard();
+  renderFinances();
   renderCleaners();
   renderUpdates();
 };

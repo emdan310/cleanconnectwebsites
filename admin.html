@@ -29,6 +29,7 @@
       <nav class="ops-tabs" aria-label="Dashboard views">
         <button class="ops-tab active" type="button" data-view="log">Request log</button>
         <button class="ops-tab" type="button" data-view="schedule">Schedule</button>
+        <button class="ops-tab" type="button" data-view="finances">Finances</button>
         <button class="ops-tab" type="button" data-view="updates">Updates</button>
         <button class="ops-tab" type="button" data-view="cleaners">Cleaners</button>
       </nav>
@@ -98,6 +99,67 @@
           <div class="month-calendar" id="cleaning-calendar"></div>
         </section>
         <section class="calendar-detail hidden" id="calendar-detail"></section>
+      </section>
+
+      <section class="ops-view" data-view-panel="finances">
+        <section class="metric-grid finance-metrics" aria-label="Finance totals">
+          <article class="metric-card primary">
+            <span>Net cash</span>
+            <strong id="finance-net">$0</strong>
+          </article>
+          <article class="metric-card">
+            <span>Booking revenue</span>
+            <strong id="finance-bookings">$0</strong>
+          </article>
+          <article class="metric-card">
+            <span>Manual revenue</span>
+            <strong id="finance-revenue">$0</strong>
+          </article>
+          <article class="metric-card">
+            <span>Expenses</span>
+            <strong id="finance-expenses">$0</strong>
+          </article>
+        </section>
+
+        <form class="finance-form" id="finance-form">
+          <label>
+            <span>Type</span>
+            <select id="finance-type">
+              <option value="revenue">Revenue</option>
+              <option value="expense">Expense</option>
+            </select>
+          </label>
+          <label>
+            <span>Category</span>
+            <input id="finance-category" type="text" placeholder="Supplies, payout, fee" autocomplete="off" />
+          </label>
+          <label>
+            <span>Description</span>
+            <input id="finance-title" type="text" placeholder="What happened?" autocomplete="off" required />
+          </label>
+          <label>
+            <span>Amount</span>
+            <input id="finance-amount" type="number" min="0" step="0.01" placeholder="0.00" required />
+          </label>
+          <label>
+            <span>Date</span>
+            <input id="finance-date" type="date" required />
+          </label>
+          <label class="finance-notes-field">
+            <span>Notes</span>
+            <input id="finance-notes" type="text" placeholder="Optional" autocomplete="off" />
+          </label>
+          <button type="submit">Book entry</button>
+        </form>
+
+        <div class="section-heading">
+          <div>
+            <p>Cash movement</p>
+            <h2>Finance ledger</h2>
+          </div>
+          <span id="finance-count">0 entries</span>
+        </div>
+        <div class="finance-ledger" id="finance-ledger"></div>
       </section>
 
       <section class="ops-view" data-view-panel="updates">

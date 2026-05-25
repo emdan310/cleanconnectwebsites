@@ -3,6 +3,7 @@
     "cleanconnectRequests",
     "cleanconnectCleaners",
     "cleanconnectUpdates",
+    "cleanconnectFinanceEntries",
   ]);
   const config = window.CLEANCONNECT_SUPABASE || {};
   const enabled = Boolean(config.url && config.anonKey && window.supabase?.createClient);
