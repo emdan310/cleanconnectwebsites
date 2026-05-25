@@ -1,0 +1,71 @@
+const Stripe = require("stripe");
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+const json = (response, statusCode, body) => {
+  response.statusCode = statusCode;
+  response.setHeader("Content-Type", "application/json");
+  response.end(JSON.stringify(body));
+};
+
+const readBody = (request) =>
+  new Promise((resolve, reject) => {
+    let body = "";
+    request.on("data", (chunk) => {
+      body += chunk;
+    });
+    request.on("end", () => {
+      try {
+        resolve(body ? JSON.parse(body) : {});
+      } catch (error) {
+        reject(error);
+      }
+    });
+  });
+
+module.exports = async (request, response) => {
+  if (request.method !== "POST") {
+    json(response, 405, { error: "Method not allowed" });
+    return;
+  }
+
+  if (!process.env.STRIPE_SECRET_KEY) {
+    json(response, 500, { error: "Stripe is not configured." });
+    return;
+  }
+
+  try {
+    const { booking = {} } = await readBody(request);
+    const origin = request.headers.origin || `https://${process.env.VERCEL_URL}`;
+    const amount = Number(process.env.STRIPE_CLEANING_PRICE_CENTS || 3200);
+
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment",
+      payment_method_types: ["card"],
+      success_url: `${origin}/?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/?checkout=cancelled`,
+      customer_email: booking.customerEmail || undefined,
+      line_items: [
+        {
+          quantity: 1,
+          price_data: {
+            currency: "usd",
+            unit_amount: amount,
+            product_data: {
+              name: booking.serviceLabel || "Room cleaning",
+              description: booking.location ? String(booking.location).slice(0, 250) : undefined,
+            },
+          },
+        },
+      ],
+      metadata: {
+        order_group_id: booking.orderGroupId || "",
+        service: booking.service || "cleaning",
+      },
+    });
+
+    json(response, 200, { url: session.url, id: session.id });
+  } catch (error) {
+    json(response, 500, { error: error.message || "Unable to start Stripe Checkout." });
+  }
+};

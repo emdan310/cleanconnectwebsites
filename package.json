@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "build": "echo \"Static CleanConnect deploy\""
+  },
+  "dependencies": {
+    "stripe": "^18.0.0"
+  }
+}

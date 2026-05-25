@@ -53,6 +53,7 @@ const cleanersStorageKey = "cleanconnectCleaners";
 const cleanerSessionKey = "cleanconnectCleanerSession";
 const updatesStorageKey = "cleanconnectUpdates";
 const exampleResetStorageKey = "cleanconnectExamplesClearedV2";
+const pendingCheckoutKey = "cleanconnectPendingCheckout";
 let activeOrderSlide = "details";
 let selectedCleaner = null;
 let editingRequestId = "";
@@ -1094,11 +1095,21 @@ const getOrderDetails = (timeOptions, orderGroupId) => {
   };
 };
 
-const fileRequest = () => {
-  const requests = readRequests();
+const createRequestFromCurrentOrder = () => {
   const times = getSelectedTimes();
   const orderGroupId = `CC-${Date.now().toString().slice(-6)}`;
-  const newRequest = getOrderDetails(times, orderGroupId);
+  return getOrderDetails(times, orderGroupId);
+};
+
+const fileRequest = (request = createRequestFromCurrentOrder()) => {
+  const requests = readRequests();
+  const newRequest = {
+    ...request,
+    status: request.status || "Paid",
+    submittedAt: request.submittedAt || new Date().toISOString(),
+  };
+
+  if (requests.some((item) => item.orderGroupId === newRequest.orderGroupId)) return;
 
   writeRequests([newRequest, ...requests]);
   logUpdate({
@@ -1106,6 +1117,75 @@ const fileRequest = () => {
     request: newRequest,
     message: `${newRequest.location} was booked with ${formatTimeOptions(newRequest.timeOptions)}.`,
   });
+};
+
+const startStripeCheckout = async () => {
+  const booking = createRequestFromCurrentOrder();
+  localStorage.setItem(pendingCheckoutKey, JSON.stringify(booking));
+  payButton.disabled = true;
+  payLabel.textContent = "Opening Stripe...";
+
+  try {
+    const response = await fetch("/api/create-checkout-session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ booking }),
+    });
+    const data = await response.json();
+
+    if (!response.ok || !data.url) {
+      throw new Error(data.error || "Stripe Checkout could not start.");
+    }
+
+    window.location.href = data.url;
+  } catch (error) {
+    payButton.disabled = false;
+    updatePayment();
+    alert(error.message || "Stripe Checkout could not start.");
+  }
+};
+
+const completeStripeCheckout = async () => {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("checkout") !== "success") return false;
+
+  const sessionId = params.get("session_id");
+  const pending = JSON.parse(localStorage.getItem(pendingCheckoutKey) || "null");
+  const cleanUrl = `${window.location.origin}${window.location.pathname}`;
+
+  if (!sessionId || !pending) {
+    window.history.replaceState({}, "", cleanUrl);
+    return false;
+  }
+
+  const response = await fetch(`/api/confirm-checkout-session?session_id=${encodeURIComponent(sessionId)}`);
+  const data = await response.json();
+
+  if (response.ok && data.paid) {
+    fileRequest({
+      ...pending,
+      stripeCheckoutSessionId: sessionId,
+      stripePaymentStatus: data.paymentStatus,
+      submittedAt: new Date().toISOString(),
+    });
+    localStorage.removeItem(pendingCheckoutKey);
+    showOrderSlide("details");
+    showScreen("confirmation");
+  } else {
+    alert(data.error || "Stripe payment was not completed.");
+  }
+
+  window.history.replaceState({}, "", cleanUrl);
+  return true;
+};
+
+const handleStripeCancel = () => {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("checkout") !== "cancelled") return false;
+
+  window.history.replaceState({}, "", `${window.location.origin}${window.location.pathname}`);
+  showScreen("payment");
+  return true;
 };
 
 addressSearches.forEach((wrapper) => {
@@ -1294,11 +1374,7 @@ paymentSummary.addEventListener("keydown", (event) => {
   togglePaymentSummary();
 });
 
-payButton.addEventListener("click", () => {
-  fileRequest();
-  showOrderSlide("details");
-  showScreen("confirmation");
-});
+payButton.addEventListener("click", startStripeCheckout);
 
 newBookingButton.addEventListener("click", () => {
   selectedCleaner = null;
@@ -1373,6 +1449,9 @@ const initializeApp = () => {
   updateSelectedCleaner();
   updateTimeButtons();
   showOrderSlide(activeOrderSlide);
+  completeStripeCheckout().then((completed) => {
+    if (!completed) handleStripeCancel();
+  });
 };
 
 window.addEventListener("storage", (event) => {
