@@ -34,6 +34,8 @@ const cleanerAvailabilityEditor = document.querySelector("#cleaner-availability-
 const availabilityWeekLabel = document.querySelector("#availability-week-label");
 const availabilityPrev = document.querySelector("#availability-prev");
 const availabilityNext = document.querySelector("#availability-next");
+const availabilityRepeatToggle = document.querySelector("#availability-repeat-toggle");
+const availabilityRepeatWeeks = document.querySelector("#availability-repeat-weeks");
 
 let signedInCleanerName = localStorage.getItem(cleanerSessionKey) || "";
 let cleanerCalendarAnchor = null;
@@ -51,6 +53,11 @@ const defaultAvailabilityDurationMinutes = availabilityStepMinutes;
 
 const calendarSlotHeight = () =>
   Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--calendar-slot-height")) || 24;
+
+const syncAvailabilityRepeatControls = () => {
+  if (!availabilityRepeatToggle || !availabilityRepeatWeeks) return;
+  availabilityRepeatWeeks.disabled = !availabilityRepeatToggle.checked;
+};
 
 const resetHorizontalScroll = () => {
   document.documentElement.scrollLeft = 0;
@@ -90,6 +97,8 @@ const normalizeAvailabilitySlot = (slot, index = 0) => {
     id: typeof slot === "object" && slot?.id ? slot.id : `availability-${start.getTime()}-${index}`,
     start: toLocalDateTimeValue(start),
     end: toLocalDateTimeValue(end),
+    repeatGroupId: typeof slot === "object" && slot?.repeatGroupId ? slot.repeatGroupId : "",
+    repeatedFrom: typeof slot === "object" && slot?.repeatedFrom ? slot.repeatedFrom : "",
   };
 };
 
@@ -373,6 +382,12 @@ const updateCleanerAvailability = (slots) => {
   return cleaners[cleanerIndex];
 };
 
+const availabilitySlotExists = (slots, candidate) =>
+  slots.some((slot) => {
+    const normalized = normalizeAvailabilitySlot(slot);
+    return normalized?.start === candidate.start && normalized?.end === candidate.end;
+  });
+
 const addAvailabilitySlot = (cleaner, date, minutes, duration = defaultAvailabilityDurationMinutes) => {
   const startMinutes = clampAvailabilityMinutes(
     snapAvailabilityMinutes(minutes),
@@ -380,13 +395,37 @@ const addAvailabilitySlot = (cleaner, date, minutes, duration = defaultAvailabil
   );
   const start = dateAtMinutes(date, startMinutes);
   const end = dateAtMinutes(date, startMinutes + duration);
+  const repeatCount = availabilityRepeatToggle?.checked
+    ? Math.max(1, Number(availabilityRepeatWeeks?.value || 1))
+    : 1;
+  const repeatGroupId = repeatCount > 1 ? `repeat-${Date.now()}` : "";
   const slot = {
     id: `availability-${Date.now()}`,
     start: toDateTimeLocal(start),
     end: toDateTimeLocal(end),
+    repeatGroupId,
+    repeatedFrom: "",
   };
+  const slots = [...(cleaner.availability || [])];
+  const nextSlots = [];
 
-  const nextCleaner = updateCleanerAvailability([...(cleaner.availability || []), slot]);
+  for (let index = 0; index < repeatCount; index += 1) {
+    const repeatStart = addDays(start, index * 7);
+    const repeatEnd = addDays(end, index * 7);
+    const nextSlot = {
+      ...slot,
+      id: index === 0 ? slot.id : `availability-${Date.now()}-${index}`,
+      start: toDateTimeLocal(repeatStart),
+      end: toDateTimeLocal(repeatEnd),
+      repeatedFrom: index === 0 ? "" : slot.id,
+    };
+
+    if (!availabilitySlotExists([...slots, ...nextSlots], nextSlot)) {
+      nextSlots.push(nextSlot);
+    }
+  }
+
+  const nextCleaner = updateCleanerAvailability([...slots, ...nextSlots]);
   if (nextCleaner) renderCleanerAvailability(nextCleaner);
 };
 
@@ -1072,6 +1111,8 @@ availabilityNext.addEventListener("click", () => {
   if (cleaner) renderCleanerAvailability(cleaner);
 });
 
+availabilityRepeatToggle?.addEventListener("change", syncAvailabilityRepeatControls);
+
 document.addEventListener("pointermove", (event) => {
   if (availabilityCreateDrag) {
     updateAvailabilityDraft(event);
@@ -1207,6 +1248,7 @@ window.addEventListener("storage", (event) => {
 });
 
 (window.CleanConnectSync?.ready || Promise.resolve()).finally(() => {
+  syncAvailabilityRepeatControls();
   signedInCleanerName = localStorage.getItem(cleanerSessionKey) || "";
   renderPortal();
 });

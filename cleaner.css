@@ -633,6 +633,52 @@ h3 {
   background: rgba(255, 253, 247, 0.46);
 }
 
+.availability-repeat {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: -4px 0 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(255, 253, 247, 0.58);
+}
+
+.availability-repeat label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  color: var(--ink);
+  font-size: 0.84rem;
+  font-weight: 850;
+}
+
+.availability-repeat input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--teal);
+}
+
+.availability-repeat select {
+  min-height: 36px;
+  max-width: 122px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0 9px;
+  color: var(--teal-deep);
+  background: rgba(255, 253, 247, 0.88);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+
+.availability-repeat select:disabled {
+  color: var(--muted);
+  opacity: 0.62;
+}
+
 .availability-editor {
   width: 100%;
   max-width: 100%;
