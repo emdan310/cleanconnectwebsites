@@ -1,7 +1,5 @@
 const Stripe = require("stripe");
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
 module.exports = async (request, response) => {
   if (request.method !== "GET") {
     response.statusCode = 405;
@@ -16,6 +14,7 @@ module.exports = async (request, response) => {
   }
 
   try {
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
     const url = new URL(request.url, `https://${request.headers.host}`);
     const sessionId = url.searchParams.get("session_id");
 

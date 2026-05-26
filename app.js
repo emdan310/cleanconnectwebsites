@@ -58,6 +58,17 @@ let activeOrderSlide = "details";
 let selectedCleaner = null;
 let editingRequestId = "";
 
+const readJsonResponse = async (response) => {
+  const text = await response.text();
+  if (!text) return {};
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return { error: text.slice(0, 180) };
+  }
+};
+
 const suggestedAddresses = [
   {
     name: "The Radian",
@@ -1131,7 +1142,7 @@ const startStripeCheckout = async () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ booking }),
     });
-    const data = await response.json();
+    const data = await readJsonResponse(response);
 
     if (!response.ok || !data.url) {
       throw new Error(data.error || "Stripe Checkout could not start.");
@@ -1141,7 +1152,7 @@ const startStripeCheckout = async () => {
   } catch (error) {
     payButton.disabled = false;
     updatePayment();
-    alert(error.message || "Stripe Checkout could not start.");
+    alert(`Stripe Checkout could not start: ${error.message || "Unknown error"}`);
   }
 };
 
@@ -1158,8 +1169,16 @@ const completeStripeCheckout = async () => {
     return false;
   }
 
-  const response = await fetch(`/api/confirm-checkout-session?session_id=${encodeURIComponent(sessionId)}`);
-  const data = await response.json();
+  let response;
+  let data;
+
+  try {
+    response = await fetch(`/api/confirm-checkout-session?session_id=${encodeURIComponent(sessionId)}`);
+    data = await readJsonResponse(response);
+  } catch (error) {
+    alert(`Stripe payment verification failed: ${error.message || "Unknown error"}`);
+    return true;
+  }
 
   if (response.ok && data.paid) {
     fileRequest({

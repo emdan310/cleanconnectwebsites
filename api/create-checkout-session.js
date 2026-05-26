@@ -1,7 +1,5 @@
 const Stripe = require("stripe");
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
 const json = (response, statusCode, body) => {
   response.statusCode = statusCode;
   response.setHeader("Content-Type", "application/json");
@@ -35,6 +33,7 @@ module.exports = async (request, response) => {
   }
 
   try {
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
     const { booking = {} } = await readBody(request);
     const origin = request.headers.origin || `https://${process.env.VERCEL_URL}`;
     const amount = Number(process.env.STRIPE_CLEANING_PRICE_CENTS || 3200);
