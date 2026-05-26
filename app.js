@@ -61,6 +61,13 @@ let selectedCleaner = null;
 let editingRequestId = "";
 let embeddedCheckoutInstance = null;
 
+const productionOrigin = "https://cleanconnectwebsites.vercel.app";
+const apiBaseUrl = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+  ? productionOrigin
+  : "";
+
+const apiUrl = (path) => `${apiBaseUrl}${path}`;
+
 const readJsonResponse = async (response) => {
   const text = await response.text();
   if (!text) return {};
@@ -1157,7 +1164,7 @@ const startStripeCheckout = async () => {
       embeddedCheckoutInstance.destroy();
     }
 
-    const configResponse = await fetch("/api/stripe-config");
+    const configResponse = await fetch(apiUrl("/api/stripe-config"));
     const config = await readJsonResponse(configResponse);
 
     if (!configResponse.ok || !config.publishableKey) {
@@ -1167,7 +1174,7 @@ const startStripeCheckout = async () => {
     let checkoutSessionId = "";
     const stripe = window.Stripe(config.publishableKey);
     const fetchClientSecret = async () => {
-      const response = await fetch("/api/create-checkout-session", {
+      const response = await fetch(apiUrl("/api/create-checkout-session"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ booking }),
@@ -1216,7 +1223,7 @@ const completeStripeCheckout = async (checkoutSessionId = "") => {
   let data;
 
   try {
-    response = await fetch(`/api/confirm-checkout-session?session_id=${encodeURIComponent(sessionId)}`);
+    response = await fetch(apiUrl(`/api/confirm-checkout-session?session_id=${encodeURIComponent(sessionId)}`));
     data = await readJsonResponse(response);
   } catch (error) {
     alert(`Stripe payment verification failed: ${error.message || "Unknown error"}`);
