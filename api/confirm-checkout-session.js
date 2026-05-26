@@ -7,14 +7,16 @@ module.exports = async (request, response) => {
     return;
   }
 
-  if (!process.env.STRIPE_SECRET_KEY) {
+  const secretKey = process.env.STRIPE_SECRET_KEY || process.env.Stripetestsec;
+
+  if (!secretKey) {
     response.statusCode = 500;
     response.end(JSON.stringify({ error: "Stripe is not configured." }));
     return;
   }
 
   try {
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+    const stripe = new Stripe(secretKey);
     const url = new URL(request.url, `https://${request.headers.host}`);
     const sessionId = url.searchParams.get("session_id");
 

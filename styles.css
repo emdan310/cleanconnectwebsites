@@ -1570,6 +1570,14 @@ h3 {
   justify-content: flex-start;
 }
 
+.embedded-checkout-card {
+  padding: 14px;
+}
+
+#embedded-checkout {
+  min-height: 360px;
+}
+
 .payment-method-icon {
   width: 48px;
   height: 48px;

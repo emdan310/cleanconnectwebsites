@@ -284,8 +284,12 @@
             </div>
           </div>
 
+          <div class="card embedded-checkout-card hidden" id="embedded-checkout-card">
+            <div id="embedded-checkout"></div>
+          </div>
+
           <button class="primary-cta" type="button" id="pay-button">
-            <span id="pay-label">Pay and book</span>
+            <span id="pay-label">Enter payment details</span>
             <svg class="icon cta-arrow" aria-hidden="true"><use href="#icon-arrow"></use></svg>
           </button>
         </section>
@@ -380,6 +384,7 @@
       </section>
     </main>
 
+    <script src="https://js.stripe.com/v3/"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     <script src="supabase-sync.js"></script>

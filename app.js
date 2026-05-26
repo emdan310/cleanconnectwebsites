@@ -47,6 +47,8 @@ const paymentService = document.querySelector("#payment-service");
 const paymentPrice = document.querySelector("#payment-price");
 const confirmationPrice = document.querySelector("#confirmation-price");
 const payLabel = document.querySelector("#pay-label");
+const embeddedCheckoutCard = document.querySelector("#embedded-checkout-card");
+const embeddedCheckout = document.querySelector("#embedded-checkout");
 const addressSearches = document.querySelectorAll("[data-address-search]");
 const requestStorageKey = "cleanconnectRequests";
 const cleanersStorageKey = "cleanconnectCleaners";
@@ -57,6 +59,7 @@ const pendingCheckoutKey = "cleanconnectPendingCheckout";
 let activeOrderSlide = "details";
 let selectedCleaner = null;
 let editingRequestId = "";
+let embeddedCheckoutInstance = null;
 
 const readJsonResponse = async (response) => {
   const text = await response.text();
@@ -189,7 +192,7 @@ const paymentDetails = {
   cleaning: {
     service: "Room cleaning",
     price: "$32",
-    label: "Pay and book",
+    label: "Enter payment details",
   },
 };
 
@@ -1025,6 +1028,17 @@ const updatePayment = () => {
   renderPaymentOrderDetails();
 };
 
+const resetEmbeddedCheckout = () => {
+  if (embeddedCheckoutInstance?.destroy) {
+    embeddedCheckoutInstance.destroy();
+  }
+  embeddedCheckoutInstance = null;
+  embeddedCheckoutCard?.classList.add("hidden");
+  if (embeddedCheckout) embeddedCheckout.innerHTML = "";
+  payButton.disabled = false;
+  updatePayment();
+};
+
 const scopeLabels = {
   bedrooms: "Bedrooms",
   bathrooms: "Bathrooms",
@@ -1134,35 +1148,64 @@ const startStripeCheckout = async () => {
   const booking = createRequestFromCurrentOrder();
   localStorage.setItem(pendingCheckoutKey, JSON.stringify(booking));
   payButton.disabled = true;
-  payLabel.textContent = "Opening Stripe...";
+  payLabel.textContent = "Loading secure payment...";
 
   try {
-    const response = await fetch("/api/create-checkout-session", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ booking }),
-    });
-    const data = await readJsonResponse(response);
+    if (!window.Stripe) throw new Error("Stripe.js did not load.");
 
-    if (!response.ok || !data.url) {
-      throw new Error(data.error || "Stripe Checkout could not start.");
+    if (embeddedCheckoutInstance?.destroy) {
+      embeddedCheckoutInstance.destroy();
     }
 
-    window.location.href = data.url;
+    const configResponse = await fetch("/api/stripe-config");
+    const config = await readJsonResponse(configResponse);
+
+    if (!configResponse.ok || !config.publishableKey) {
+      throw new Error(config.error || "Stripe publishable key is not configured.");
+    }
+
+    let checkoutSessionId = "";
+    const stripe = window.Stripe(config.publishableKey);
+    const fetchClientSecret = async () => {
+      const response = await fetch("/api/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ booking }),
+      });
+      const data = await readJsonResponse(response);
+
+      if (!response.ok || !data.clientSecret) {
+        throw new Error(data.error || "Stripe Checkout could not start.");
+      }
+
+      checkoutSessionId = data.id;
+      return data.clientSecret;
+    };
+
+    embeddedCheckoutCard.classList.remove("hidden");
+    embeddedCheckoutInstance = await stripe.initEmbeddedCheckout({
+      fetchClientSecret,
+      onComplete: async () => {
+        await completeStripeCheckout(checkoutSessionId);
+      },
+    });
+
+    embeddedCheckoutInstance.mount("#embedded-checkout");
+    payButton.disabled = true;
+    payLabel.textContent = "Complete payment above";
   } catch (error) {
-    payButton.disabled = false;
-    updatePayment();
+    resetEmbeddedCheckout();
     alert(`Stripe Checkout could not start: ${error.message || "Unknown error"}`);
   }
 };
 
-const completeStripeCheckout = async () => {
+const completeStripeCheckout = async (checkoutSessionId = "") => {
   const params = new URLSearchParams(window.location.search);
-  if (params.get("checkout") !== "success") return false;
-
-  const sessionId = params.get("session_id");
+  const sessionId = checkoutSessionId || params.get("session_id");
   const pending = JSON.parse(localStorage.getItem(pendingCheckoutKey) || "null");
   const cleanUrl = `${window.location.origin}${window.location.pathname}`;
+
+  if (!checkoutSessionId && params.get("checkout") !== "success") return false;
 
   if (!sessionId || !pending) {
     window.history.replaceState({}, "", cleanUrl);
@@ -1188,6 +1231,7 @@ const completeStripeCheckout = async () => {
       submittedAt: new Date().toISOString(),
     });
     localStorage.removeItem(pendingCheckoutKey);
+    resetEmbeddedCheckout();
     showOrderSlide("details");
     showScreen("confirmation");
   } else {
@@ -1397,6 +1441,7 @@ payButton.addEventListener("click", startStripeCheckout);
 
 newBookingButton.addEventListener("click", () => {
   selectedCleaner = null;
+  resetEmbeddedCheckout();
   updateSelectedCleaner();
   timeList.querySelectorAll(".time-row").forEach((row, index) => {
     if (index === 0) {

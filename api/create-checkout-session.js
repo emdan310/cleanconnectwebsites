@@ -27,22 +27,25 @@ module.exports = async (request, response) => {
     return;
   }
 
-  if (!process.env.STRIPE_SECRET_KEY) {
+  const secretKey = process.env.STRIPE_SECRET_KEY || process.env.Stripetestsec;
+
+  if (!secretKey) {
     json(response, 500, { error: "Stripe is not configured." });
     return;
   }
 
   try {
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+    const stripe = new Stripe(secretKey);
     const { booking = {} } = await readBody(request);
     const origin = request.headers.origin || `https://${process.env.VERCEL_URL}`;
     const amount = Number(process.env.STRIPE_CLEANING_PRICE_CENTS || 3200);
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
+      ui_mode: "embedded",
+      redirect_on_completion: "if_required",
       payment_method_types: ["card"],
-      success_url: `${origin}/?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/?checkout=cancelled`,
+      return_url: `${origin}/?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
       customer_email: booking.customerEmail || undefined,
       line_items: [
         {
@@ -63,7 +66,7 @@ module.exports = async (request, response) => {
       },
     });
 
-    json(response, 200, { url: session.url, id: session.id });
+    json(response, 200, { clientSecret: session.client_secret, id: session.id });
   } catch (error) {
     json(response, 500, { error: error.message || "Unable to start Stripe Checkout." });
   }
